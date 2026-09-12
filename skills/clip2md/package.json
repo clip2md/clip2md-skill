@@ -1,0 +1,10 @@
+{
+  "name": "clip2md",
+  "version": "1.0.0",
+  "description": "Clip2MD user Skill for AI assistant web clipping",
+  "main": "scripts/clip2md.js",
+  "bin": { "clip2md": "scripts/clip2md.js" },
+  "scripts": { "test": "node --test" },
+  "keywords": ["clip2md", "clip", "markdown", "openclaw", "skill"],
+  "license": "MIT-0"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "clip2md-skill",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test": "node --test skills/clip2md/test/*.test.js"
+  }
+}

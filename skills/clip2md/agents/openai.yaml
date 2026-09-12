@@ -1,0 +1,7 @@
+interface:
+  display_name: "Clip2MD"
+  short_description: "Save web pages as Markdown with Clip2MD"
+  default_prompt: "Use $clip2md to save this web page as Markdown and report the task status."
+
+policy:
+  allow_implicit_invocation: true
