@@ -11,13 +11,18 @@ clip2md 项目的 Claude Code、Codex 和 OpenClaw Skill 集合。
 ```
 clip2md-skill/
 ├── README.md
+├── SKILL.md         # 仓库根目录安装入口
 ├── .gitignore
 └── skills/clip2md/  # 用户剪藏 Skill 与 CLI
 ```
 
 ## 使用方式
 
-将 `skills/clip2md` 安装到对应助手的 Skill 目录：Claude Code 使用 `~/.claude/skills/clip2md`，Codex 使用 `~/.codex/skills/clip2md`，OpenClaw 使用工作区的 `skills/clip2md`。安装后有两种连接方式：运行 `clip2md connect`，再在 Clip2MD Web 端或小程序的“AI 助手”页面确认绑定码；或者在 Web 端点击“生成授权语句”，把整段语句交给助手，让助手通过 `clip2md connect --authorization-code-stdin` 读取一次性授权码完成连接。生成授权语句即授权，请只发给你信任的助手。
+可以直接从仓库根目录安装：根目录的 `SKILL.md` 会加载 `skills/clip2md/SKILL.md`，运行 `node skills/clip2md/scripts/clip2md.js <command>`。此方式必须保留整个 `skills/clip2md/` 子目录，不能仅复制根目录的 `SKILL.md`。
+
+也可以只将 `skills/clip2md` 安装到对应助手的 Skill 目录：Claude Code 使用 `~/.claude/skills/clip2md`，Codex 使用 `~/.codex/skills/clip2md`，OpenClaw 使用工作区的 `skills/clip2md`；此方式运行 `node scripts/clip2md.js <command>`。两种入口选择一种安装，避免重复加载。
+
+安装后有两种连接方式：运行 `clip2md connect`，再在 Clip2MD Web 端或小程序的“AI 助手”页面确认绑定码；或者在 Web 端点击“生成授权语句”，把整段语句交给助手，让助手通过 `clip2md connect --authorization-code-stdin` 读取一次性授权码完成连接。生成授权语句即授权，请只发给你信任的助手。
 
 CLI 默认访问生产 API `https://api.clip2md.cn/api/v1`；本地 mock 或私有部署可通过 `CLIP2MD_API_BASE` 覆盖，升级引导地址可通过 `CLIP2MD_APP_URL` 覆盖。AI 助手 Skill 业务能力只对当前生效的 Pro 年卡开放，CLI 会保留结构化资格错误并显示年卡开通地址。CLI smoke test 位于 `skills/clip2md/test`，执行 `npm test`。
 
@@ -27,4 +32,4 @@ Private
 
 ## 永久额度反馈
 
-YouTube、视频号、微博、CSDN、知乎、豆瓣日记和 Apple Podcast 单集每个消耗 1 次永久额度；普通链接优先使用每日额度，用尽后使用永久额度。CLI 普通输出会依据服务端 `quota_consumed_type=permanent` 显示实际消耗，JSON 输出保留该字段；短链以解析后的内容类型及服务端实际扣费为准。助手提交前应说明计费规则。本次仅源码修复，尚未打包发布。
+YouTube、视频号、微博、CSDN、知乎、豆瓣日记和 Apple Podcast 单集每个消耗 1 次永久额度；普通链接优先使用每日额度，用尽后使用永久额度。CLI 普通输出会依据服务端 `quota_consumed_type=permanent` 显示实际消耗，JSON 输出保留该字段；短链以解析后的内容类型及服务端实际扣费为准。助手提交前应说明计费规则。
