@@ -24,3 +24,7 @@ CLI 默认访问生产 API `https://api.clip2md.cn/api/v1`；本地 mock 或私�
 ## 许可证
 
 Private
+
+## 永久额度反馈
+
+YouTube、视频号、微博、CSDN、知乎、豆瓣日记和 Apple Podcast 单集每个消耗 1 次永久额度；普通链接优先使用每日额度，用尽后使用永久额度。CLI 普通输出会依据服务端 `quota_consumed_type=permanent` 显示实际消耗，JSON 输出保留该字段；短链以解析后的内容类型及服务端实际扣费为准。助手提交前应说明计费规则。本次仅源码修复，尚未打包发布。

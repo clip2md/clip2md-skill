@@ -161,6 +161,7 @@ async function request(method, endpoint, { auth = 'skill', body = null } = {}) {
 function printTask(task) {
   console.log(`任务 ID: ${task.id}`);
   console.log(`状态: ${task.status}`);
+  if (task.quota_consumed_type === 'permanent') console.log('该任务已消耗 1 次永久额度。');
   if (task.title || task.source_title) console.log(`标题: ${task.title || task.source_title}`);
   if (task.error_msg) console.log(`错误: ${task.error_msg}`);
   console.log(`Markdown: ${(task.note_markdown_content || task.source_markdown_content) ? '已生成' : '未生成'}`);
@@ -456,11 +457,15 @@ async function cmdClip(url) {
     }
     if (!autoWait) {
       if (jsonOutput) printJson({ ...taskPayload(task), auto_wait: false });
-      else console.log(`任务已提交 (ID: ${task.id}, 状态: ${task.status})`);
+      else {
+        console.log(`任务已提交 (ID: ${task.id}, 状态: ${task.status})`);
+        if (task.quota_consumed_type === 'permanent') console.log('任务已创建，已消耗 1 次永久额度。');
+      }
       applyTaskExitCode(task);
       return;
     }
 
+    if (!jsonOutput && task.quota_consumed_type === 'permanent') console.log('任务已创建，已消耗 1 次永久额度。');
     const outcome = await waitForTask(String(task.id), waitOptions, pending => {
       if (!jsonOutput) console.log(`等待中: 任务 ${pending.id} 状态 ${pending.status}`);
     });
@@ -484,7 +489,10 @@ async function cmdClip(url) {
   }, async () => {
     const task = await request('POST', '/tasks', { auth: 'legacy', body: { url } });
     if (jsonOutput) printJson({ ...taskPayload(task), auto_wait: false });
-    else console.log(`任务已提交 (ID: ${task.id}, 状态: ${task.status})`);
+    else {
+      console.log(`任务已提交 (ID: ${task.id}, 状态: ${task.status})`);
+      if (task.quota_consumed_type === 'permanent') console.log('任务已创建，已消耗 1 次永久额度。');
+    }
     applyTaskExitCode(task);
   });
 }

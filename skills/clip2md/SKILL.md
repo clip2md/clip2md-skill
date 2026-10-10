@@ -30,7 +30,7 @@ it never prints the code or a complete credential.
 
 - Use `connect` when no Skill credential exists, when the user asks to connect, or when the credential is expired or revoked.
 - Use `connect --authorization-code-stdin` when the user provides a web generated authorization sentence. Pass only the authorization code through stdin; do not put it in a shell argument, URL, log, or chat response. The CLI stores a short lived claim identifier locally so a lost response can be retried safely.
-- Use `clip` only for a single HTTP(S) URL. Return the task ID and current status.
+- Use `clip` only for a single HTTP(S) URL. Before submission, explain that YouTube, WeChat Channels, Weibo, CSDN, Zhihu, Douban notes and Apple Podcast episodes each cost one permanent quota; ordinary links use daily quota first, then permanent quota. Short links are billed by their resolved content type. Return the task ID, current status and actual `quota_consumed_type`; report permanent quota consumption only when the response confirms it.
 - Use `wait` only when the user asks to wait, or when the saved execution preference requests it.
 - Use `result` only after the task succeeds. Respect the saved Markdown preference unless the user explicitly asks for another kind.
 - Use `quota` and `status` for read-only checks.

@@ -102,7 +102,7 @@ function handleRequest(req, res, requestState = {}) {
         return;
       }
       requestState.taskRequests = (requestState.taskRequests || 0) + 1;
-      respond(res, 200, { id: 7, status: 'PENDING', title: '待处理页面' });
+      respond(res, 200, { id: 7, status: 'PENDING', title: '待处理页面', quota_consumed_type: requestState.quotaType });
       return;
     }
     if (url.pathname === '/api/v1/skill/me') {
@@ -110,7 +110,7 @@ function handleRequest(req, res, requestState = {}) {
         api_version: 'v1',
         device: { id: 1, name: '测试助手', status: 'active', key_prefix: 'test' },
         credential_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        preferences: { auto_wait: false, wait_timeout_seconds: 120, markdown_content: 'source' },
+        preferences: { auto_wait: requestState.autoWait === true, wait_timeout_seconds: 120, markdown_content: 'source' },
         usage: { daily: 1, daily_limit: 20, monthly: 3, monthly_limit: 300 },
         eligibility: {
           eligible: true,
@@ -141,7 +141,7 @@ function handleRequest(req, res, requestState = {}) {
       return;
     }
     if (url.pathname === '/api/v1/tasks' && req.method === 'POST') {
-      respond(res, 200, { id: 10, status: 'PENDING', title: '旧 token 任务' });
+      respond(res, 200, { id: 10, status: 'PENDING', title: '旧 token 任务', quota_consumed_type: requestState.quotaType });
       return;
     }
     if (url.pathname === '/api/v1/tasks/10' && req.method === 'GET') {
@@ -333,5 +333,39 @@ test('commands warn when the local credential expires within seven days', async 
     const result = await runCli('quota', ['--json'], home);
     assert.equal(result.code, 0);
     assert.match(result.stderr, /Skill 凭证将在 \d+ 天后到期/);
+  } finally { fs.rmSync(home, { recursive: true, force: true }); }
+});
+
+for (const quotaType of ['daily', 'permanent']) {
+  test(`clip reports actual ${quotaType} quota in plain and JSON output`, async () => {
+    const home = createHome();
+    try {
+      writeCredentials(home);
+      const plain = await runCli('clip', ['https://example.com/article'], home, { quotaType });
+      assert.equal(plain.code, 0);
+      assert.equal(plain.stdout.includes('已消耗 1 次永久额度'), quotaType === 'permanent');
+      const json = await runCli('clip', ['https://example.com/article', '--json'], home, { quotaType });
+      assert.equal(json.code, 0);
+      assert.equal(JSON.parse(json.stdout).quota_consumed_type, quotaType);
+    } finally { fs.rmSync(home, { recursive: true, force: true }); }
+  });
+}
+
+test('legacy token clip also reports actual permanent quota', async () => {
+  const home = createHome();
+  try {
+    writeLegacyToken(home);
+    const result = await runCli('clip', ['https://example.com/article'], home, { quotaType: 'permanent' });
+    assert.equal(result.code, 0);
+    assert.match(result.stdout, /已消耗 1 次永久额度/);
+  } finally { fs.rmSync(home, { recursive: true, force: true }); }
+});
+test('auto-wait clip reports creation consumption before querying the task', async () => {
+  const home = createHome();
+  try {
+    writeCredentials(home);
+    const result = await runCli('clip', ['https://example.com/article'], home, { quotaType: 'permanent', autoWait: true });
+    assert.equal(result.code, 4);
+    assert.match(result.stdout, /任务已创建，已消耗 1 次永久额度/);
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
